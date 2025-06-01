@@ -1,18 +1,33 @@
 from lib.db.connection import get_connection
 
-def setup_database():
+def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Read schema file
-    with open('lib/db/schema.sql', 'r') as f:
-        schema = f.read()
-    
-    # Execute schema
-    cursor.executescript(schema)
+    cursor.executescript("""
+        CREATE TABLE IF NOT EXISTS authors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL
+        );
+        
+        CREATE TABLE IF NOT EXISTS magazines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL
+        );
+        
+        CREATE TABLE IF NOT EXISTS articles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            author_id INTEGER NOT NULL,
+            magazine_id INTEGER NOT NULL,
+            FOREIGN KEY (author_id) REFERENCES authors(id),
+            FOREIGN KEY (magazine_id) REFERENCES magazines(id)
+        );
+    """)
     conn.commit()
     conn.close()
-    print("Database setup complete!")
+    print("✅ Database tables created successfully!")
 
-if __name__ == '__main__':
-    setup_database()
+if __name__ == "__main__":
+    create_tables()
