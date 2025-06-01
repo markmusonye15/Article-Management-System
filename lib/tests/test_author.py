@@ -1,26 +1,34 @@
 from lib.models.author import Author
 from lib.db.connection import get_connection
-import pytest
 
-class TestAuthor:
-    @classmethod
-    def setup_class(cls):
-        # Setup test database
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.executescript("""
-            CREATE TABLE IF NOT EXISTS authors (id INTEGER PRIMARY KEY, name TEXT);
-            DELETE FROM authors;
-            INSERT INTO authors (name) VALUES ('Test Author');
-        """)
-        conn.commit()
-        conn.close()
+def test_create_author():
+    """Can create an author instance"""
+    author = Author(name="Ernest Hemingway")
+    assert author.name == "Ernest Hemingway"
 
-    def test_save_author(self):
-        author = Author(name="Jane Doe")
-        author.save()
-        assert author.id is not None
+def test_save_author():
+    """Can save an author to database"""
+    author = Author(name="Jane Austen")
+    author.save()
+    assert author.id is not None  # Should get database ID
 
-    def test_find_by_id(self):
-        author = Author.find_by_id(1)
-        assert author.name == "Test Author"
+def test_find_author():
+    """Can find an author by ID"""
+    author = Author(name="Agatha Christie")
+    author.save()
+    
+    found = Author.find_by_id(author.id)
+    assert found.name == "Agatha Christie"
+
+def test_author_articles_empty():
+    """New author has no articles"""
+    author = Author(name="New Writer")
+    author.save()
+    assert len(author.articles()) == 0
+
+def test_delete_author():
+    """Can delete an author"""
+    author = Author(name="Temporary Author")
+    author.save()
+    author.delete()
+    assert Author.find_by_id(author.id) is None
