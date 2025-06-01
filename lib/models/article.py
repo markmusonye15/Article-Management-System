@@ -56,4 +56,4 @@ class Article:
 
     def magazine(self):
         from lib.models.magazine import Magazine
-        return Magazine.find_by_id(self.magazine_id)
+        return Magazine.find_by_

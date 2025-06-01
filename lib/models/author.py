@@ -8,6 +8,7 @@ class Author:
     def save(self):
         conn = get_connection()
         cursor = conn.cursor()
+        
         if self.id:
             cursor.execute("UPDATE authors SET name = ? WHERE id = ?", (self.name, self.id))
         else:
